@@ -11,8 +11,9 @@ Function Move-DisabledUsersWithPipeline.ps1 {
             Remove-ADGroupMember -Identity $group -Members $_.SamAccountName -Confirm:$false
 
         }
+
         Add-ADGroupMember -Identity DisabledUsers -Members $_.SamAccountName
-        Set-ADObject -Identity $_.SamAccountName -Replace @{primaryGroupID = "DisabledUsers"}
+        Set-ADObject -Identity $_.SamAccountName -Replace @{primaryGroupToken = $((Get-ADGroup DisabledUsers -Properties primaryGroupToken).primaryGroupToken)}
         Remove-ADGroupMember -Identity 'Domain Users' -Members $_.SamAccountName
         Move-ADObject -Identity $_ -TargetPath 'OU=FormerEmployees,DC=testlab,DC=ad'
 
