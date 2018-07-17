@@ -1,13 +1,17 @@
 Function Move-DisabledUsers {
-    [cmdletbing()]
-    Param()
+    [cmdletbinding()]
+    Param(
+        [Parameter(Mandatory, Position = 0)]
+        [String]$CSVPath
+    )
 
-    $disabledUsers = Get-ADUser -Filter { Enabled -eq $false } -Properties email,SamAccountName, memberof | Select-Object SamAccountName, Email, memberof
+    $disabledUsers = Get-ADUser -Filter { Enabled -eq $false } -Properties email, SamAccountName, memberof | Select-Object SamAccountName, Email, memberof
 
     Foreach ($user in $disabledUsers) {
 
         Foreach ($m in ($user.memberof)) {
-            Remove-ADGroupMember -Identity $($m -replace "(CN=)(.*?),.*", '$2') -Members $user.SamAccountName
+
+            Remove-ADGroupMember -Identity $m -Members $user.SamAccountName -Confirm:$false
 
         }
 
@@ -18,7 +22,7 @@ Function Move-DisabledUsers {
             'Status'         = $user.Enabled
             'Email Address'  = $user.email
             'Groups Removed' = $true
-        } | Export-CSV -Path 'C:\data\DisabledUserCleanup.csv' -NoTypeInformation -Append
+        } | Export-CSV -Path $CSVPath -NoTypeInformation -Append
     }
 
 }
