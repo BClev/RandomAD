@@ -9,8 +9,11 @@ Function Move-DisabledUsersWithPipeline.ps1 {
 
         Foreach ($group in ($_.memberOf)) {
             Remove-ADGroupMember -Identity $group -Members $_.SamAccountName -Confirm:$false
-        }
 
+        }
+        Add-ADGroupMember -Identity DisabledUsers -Members $_.SamAccountName
+        Set-ADObject -Identity $_.SamAccountName -Replace @{primaryGroupID = "DisabledUsers"}
+        Remove-ADGroupMember -Identity 'Domain Users' -Members $_.SamAccountName
         Move-ADObject -Identity $_ -TargetPath 'OU=FormerEmployees,DC=testlab,DC=ad'
 
         [pscustomobject]@{
@@ -19,5 +22,6 @@ Function Move-DisabledUsersWithPipeline.ps1 {
             'Email Address'  = $_.email
             'Groups Removed' = $true
         }
-    } | Export-CSV -Path $CSVPath -NoTypeInformation -Append
+    }| Export-CSV -Path $CSVPath -NoTypeInformation -Append
+
 }
