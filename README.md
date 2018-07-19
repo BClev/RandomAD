@@ -15,9 +15,11 @@ The example scripts used in this presentation are available by cloning this repo
 You may do so using Git:
 
 _HTML_
+
 `git clone https://svalding@bitbucket.org/svalding/psandadtalk.git`
 
 _SSH_
+
 `git clone git@bitbucket.org:svalding/psandadtalk.git`
 
-You may also (Download)[https://bitbucket.org/svalding/psandadtalk/get/7fcd596dc5ff.zip] this repository directly from a browser.
+You may also (https://bitbucket.org/svalding/psandadtalk/get/7fcd596dc5ff.zip)[Download] this repository directly from a browser.
