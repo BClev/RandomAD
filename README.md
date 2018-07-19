@@ -22,4 +22,4 @@ _SSH_
 
 `git clone git@bitbucket.org:svalding/psandadtalk.git`
 
-You may also (https://bitbucket.org/svalding/psandadtalk/get/7fcd596dc5ff.zip)[Download] this repository directly from a browser.
+You may also [Download](https://bitbucket.org/svalding/psandadtalk/downloads/) this repository directly from a browser.
