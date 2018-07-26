@@ -1,6 +1,6 @@
 # Using Powershell with Active Directory
 
-This presentation covered using the ActiveDirectory Module within Powershell
+This presentation covered using the ActiveDirectory Module within Powershell.
 
 We covered:
 
@@ -10,7 +10,7 @@ We covered:
 - Employee Hiring/Separation scripts
 - Generating reports
 
-The example scripts used in this presentation are available by cloning this repo
+The example scripts used in this presentation are available by cloning this repo.
 
 You may do so using Git:
 
