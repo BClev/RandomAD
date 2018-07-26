@@ -27,7 +27,7 @@
     .EXAMPLE
     Get-ExpiredADAccounts -Server dc.contoso.com -Days 30 -ToCSV -CSVPath D:\reports\expired_accounts.csv
 
-#>
+    #>
     [cmdletBinding()]
     Param(
         [Parameter(Mandatory, Position = 0)]
@@ -36,48 +36,55 @@
         [string]$Days,
         [Parameter(Mandatory, Position = 1, ParameterSetName = 'HTML')]
         [switch]$ToHTML,
-        [Parameter(Mandatory, Position = 2, ParameterSetName = 'HTML', ValueFromPipeline)]
+        [Parameter(Mandatory, Position = 2, ParameterSetName = 'HTML')]
         [string]$HTMLPath,
         [Parameter(Mandatory, Position = 1, ParameterSetName = 'CSV')]
         [switch]$ToCSV,
-        [Parameter(Mandatory, Position = 2, ParameterSetName = 'CSV', ValueFromPipeline)]
+        [Parameter(Mandatory, Position = 2, ParameterSetName = 'CSV')]
         [string]$CSVPath
     )
 
-    #Parameter sets hide other cmdlets from each other, which makes things super flexible.
-    Switch ($PSCmdlet.ParameterSetName) {
-        #Depending on the parameter set called, perform an action
+    Begin {
+        $neverExpiresTime = 9223372036854775807 #do not modify this value
+    }
 
-        'Html' {
+    Process {
 
-            $neverExpiresTime = 9223372036854775807 #do not modify this value
+        Switch ($PSCmdlet.ParameterSetName) {
 
-            Get-ADUser -Filter * -Properties accountExpires, msDS-UserPasswordExpiryTimeComputed |
-                Where-Object { $_.accountExpires -ne $neverExpiresTime -and [datetime]::FromFileTime([int64]::Parse($_.accountExpires)) -lt (Get-Date).AddDays($Days) } |
-                ForEach-Object {
-                [pscustomobject]@{
-                    'Name'            = $_.SamAccountName
-                    'Expiration Date' = [datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")
-                } | ConvertTo-Html -Fragment |  Add-Content -Path $HTMLPath
+            'Html' {
 
-            }#custom object
+                Get-ADUser -Filter * -Properties accountExpires, msDS-UserPasswordExpiryTimeComputed |
+                    Where-Object { $_.accountExpires -ne $neverExpiresTime -and [datetime]::FromFileTime([int64]::Parse($_.accountExpires)) -lt (Get-Date).AddDays($Days) } |
+                    ForEach-Object {
 
-        }#html item
+                    [pscustomobject]@{
+                        'Name'            = $_.SamAccountName
+                        'Expiration Date' = [datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")
+                    } | ConvertTo-Html -Fragment |  Add-Content -Path $HTMLPath
+
+                }#custom object output
+
+            }#html item
 
 
-        'CSV' {
-            $neverExpiresTime = 9223372036854775807 #do not modify this value
+            'CSV' {
 
-            Get-ADUser -Filter * -Properties accountExpires, msDS-UserPasswordExpiryTimeComputed |
-                Where-Object { $_.accountExpires -ne $neverExpiresTime -and [datetime]::FromFileTime([int64]::Parse($_.accountExpires)) -lt (Get-Date).AddDays(10) } |
-                ForEach-Object {
-                [pscustomobject]@{
-                    'Name'            = $_.SamAccountName
-                    'Expiration Date' = [datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")
-                } | Export-CSV -Path $CSVPath -Append -NoTypeInformation
 
-            }
-        } #csv switch item
-    }#switch
+                Get-ADUser -Filter * -Properties accountExpires, msDS-UserPasswordExpiryTimeComputed |
+                    Where-Object { $_.accountExpires -ne $neverExpiresTime -and [datetime]::FromFileTime([int64]::Parse($_.accountExpires)) -lt (Get-Date).AddDays(10) } |
+                    ForEach-Object {
+                    [pscustomobject]@{
+                        'Name'            = $_.SamAccountName
+                        'Expiration Date' = [datetime]::FromFileTime($_."msDS-UserPasswordExpiryTimeComputed")
+                    } | Export-CSV -Path $CSVPath -Append -NoTypeInformation
 
-}#function
+                }
+            } #csv switch item
+        }#switch
+
+    }
+
+    End {}
+
+    }#function
